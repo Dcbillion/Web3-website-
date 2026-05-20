@@ -61,7 +61,7 @@ const Navbar = ({
         <div className="logo">
 
           <span className="safe">
-            Secure
+            Safe
           </span>
 
           <span className="web3">

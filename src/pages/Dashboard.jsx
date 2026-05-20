@@ -143,7 +143,7 @@ function Dashboard() {
         <div>
           <div className="sidebar-logo">
             <h2>
-              <span className="logo-safe">Scure</span>
+              <span className="logo-safe">Safe</span>
               <span className="logo-web3">Web3</span>
               <span className="logo-vault">Vault</span>
             </h2>
