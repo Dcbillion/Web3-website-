@@ -9,27 +9,10 @@ import {
   LayoutDashboard, Wallet, Shield, Settings,
   Activity, Bell, LogOut, Briefcase, TrendingUp,
   Landmark, Bitcoin, Menu, X, Save, User, Mail,
-  ChevronRight, ArrowUpRight, ArrowDownLeft, Copy, Check,
+  ChevronRight, ArrowUpRight, ArrowDownLeft,
 } from "lucide-react";
 import WithdrawModal from "../components/WithdrawModal";
 import DepositModal from "../components/DepositModal";
-
-// ── Wallet addresses per coin ──────────────────────────────────────────────
-const COIN_ADDRESSES = {
-  USDT: "0xdc6759Aa75E8929aB3e8bFba7B8FE558b3EE82ce",
-  ETH:  "0xdc6759Aa75E8929aB3e8bFba7B8FE558b3EE82ce",
-  SOL:  "E5bMP28SRgv3enYvSWUtwHhBetd9wKWFHH1SP6d4ZsDM",
-  XLM:  "GC4Y5K7P7HHMTXU2EM7S2VF2OES53WAFK2RW5Z4GGCY2XAKYU7Y7XMJR",
-  XRP:  "rw4g24hDS5xLcaJ99ueQsvBn8Hwrfc45jh",
-  BTC:  "bc1qt9r56td2s0f5cerhj2j70yeu48g0enscc5ysjl",
-  ADA:  "addr1qx6kasv2lkttyve4h2x88r85e3c07mnupga0ympwe2dd8qkfp7vqfgqf99apejfahq7vptztztnr3dh6l28ljfq2ls9qurpzmy",
-  BNB:  "0xdc6759Aa75E8929aB3e8bFba7B8FE558b3EE82ce",
-  DOGE: "DMN1hARbbk7nzUVthH1863tj4N1Ngww5Br",
-};
-
-// Truncate long addresses for display
-const truncateAddr = (addr) =>
-  addr.length > 20 ? `${addr.slice(0, 10)}…${addr.slice(-8)}` : addr;
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -44,7 +27,6 @@ function Dashboard() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
   const [depositOpen, setDepositOpen] = useState(false);
-  const [copiedCoin, setCopiedCoin] = useState(null);
 
   const [settingsName, setSettingsName] = useState("");
   const [settingsEmail, setSettingsEmail] = useState("");
@@ -87,19 +69,15 @@ function Dashboard() {
     const fetchPrices = async () => {
       try {
         const res = await fetch(
-          "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,binancecoin,ripple,tether,stellar,cardano,dogecoin&vs_currencies=usd"
+          "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,binancecoin,ripple&vs_currencies=usd"
         );
         const data = await res.json();
         setPrices({
-          BTC:  data.bitcoin?.usd     || 0,
-          ETH:  data.ethereum?.usd    || 0,
-          SOL:  data.solana?.usd      || 0,
-          BNB:  data.binancecoin?.usd || 0,
-          XRP:  data.ripple?.usd      || 0,
-          USDT: data.tether?.usd      || 1,   // USDT ≈ $1 fallback
-          XLM:  data.stellar?.usd     || 0,
-          ADA:  data.cardano?.usd     || 0,
-          DOGE: data.dogecoin?.usd    || 0,
+          BTC: data.bitcoin?.usd || 0,
+          ETH: data.ethereum?.usd || 0,
+          SOL: data.solana?.usd || 0,
+          BNB: data.binancecoin?.usd || 0,
+          XRP: data.ripple?.usd || 0,
         });
       } catch (err) {
         console.log("Price fetch error", err);
@@ -141,15 +119,6 @@ function Dashboard() {
     }
   };
 
-  const copyAddress = (coin) => {
-    const addr = COIN_ADDRESSES[coin];
-    if (!addr) return;
-    navigator.clipboard.writeText(addr).then(() => {
-      setCopiedCoin(coin);
-      setTimeout(() => setCopiedCoin(null), 2000);
-    });
-  };
-
   const totalBalance = Object.entries(crypto || {}).reduce(
     (total, [coin, amount]) => total + Number(amount) * (prices[coin] || 0), 0
   );
@@ -162,9 +131,6 @@ function Dashboard() {
       value: (Number(amount) * (prices[coin] || 0)).toFixed(2),
       usdValue: Number(amount) * (prices[coin] || 0),
     }));
-
-  // All supported coins for the Wallets section
-  const allCoins = Object.keys(COIN_ADDRESSES);
 
   const navLinks = [
     { icon: <LayoutDashboard size={19} />, label: "Dashboard", action: () => { setMenuOpen(false); window.scrollTo({ top: 0, behavior: "smooth" }); } },
@@ -284,7 +250,7 @@ function Dashboard() {
             </div>
             <div className="settings-info-item">
               <span className="info-label">Connected Wallets</span>
-              <span className="info-val">{allCoins.length}</span>
+              <span className="info-val">{userData?.connectedWallets || 0}</span>
             </div>
             <div className="settings-info-item">
               <span className="info-label">Total Assets</span>
@@ -324,7 +290,7 @@ function Dashboard() {
           {[
             { icon: <Landmark size={18} />, label: "Portfolio Balance", val: `$${totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
             { icon: <Bitcoin size={18} />, label: "Total Assets", val: Object.keys(crypto || {}).length },
-            { icon: <Wallet size={18} />, label: "Connected Wallets", val: allCoins.length },
+            { icon: <Wallet size={18} />, label: "Connected Wallets", val: userData?.connectedWallets || 0 },
             { icon: <Shield size={18} />, label: "Security Score", val: `${userData?.securityScore || 0}%` },
           ].map((s, i) => (
             <div className="db-stat-chip" key={i}>
@@ -361,8 +327,6 @@ function Dashboard() {
 
         {/* WALLETS + ACTIVITY */}
         <div className="db-two-col">
-
-          {/* ── Wallets: one row per supported coin ── */}
           <div className="db-card">
             <div className="db-section-anchor" ref={walletsRef} />
             <div className="db-card-header">
@@ -370,27 +334,20 @@ function Dashboard() {
               <h2>Connected Wallets</h2>
             </div>
             <div className="db-wallets-list">
-              {allCoins.map((coin) => (
-                <div className="db-wallet-row" key={coin}>
-                  <div className="db-wallet-icon">
-                    <span className="db-wallet-coin-label">{coin}</span>
+              {userData?.connectedWallets > 0 ? (
+                Array.from({ length: userData.connectedWallets }).map((_, i) => (
+                  <div className="db-wallet-row" key={i}>
+                    <div className="db-wallet-icon"><Wallet size={16} /></div>
+                    <div>
+                      <p className="db-wallet-name">Wallet {i + 1}</p>
+                      <p className="db-wallet-addr">••••••••••••••••</p>
+                    </div>
+                    <span className="db-wallet-badge">Connected</span>
                   </div>
-                  <div className="db-wallet-addr-block">
-                    <p className="db-wallet-name">{coin} Wallet</p>
-                    <p className="db-wallet-addr" title={COIN_ADDRESSES[coin]}>
-                      {truncateAddr(COIN_ADDRESSES[coin])}
-                    </p>
-                  </div>
-                  <button
-                    className={`db-copy-btn ${copiedCoin === coin ? "copied" : ""}`}
-                    onClick={() => copyAddress(coin)}
-                    title="Copy address"
-                  >
-                    {copiedCoin === coin ? <Check size={14} /> : <Copy size={14} />}
-                  </button>
-                  <span className="db-wallet-badge">Connected</span>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="db-empty">No wallets connected.</p>
+              )}
             </div>
           </div>
 

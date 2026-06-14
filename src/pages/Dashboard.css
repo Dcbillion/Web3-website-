@@ -495,7 +495,6 @@
 }
 .db-wallet-row:hover { border-color: rgba(0,212,255,0.15); }
 
-/* coin ticker badge replaces the generic wallet icon */
 .db-wallet-icon {
   width: 42px;
   height: 36px;
@@ -516,7 +515,6 @@
   text-transform: uppercase;
 }
 
-/* address block sits between icon and copy btn */
 .db-wallet-addr-block {
   flex: 1;
   min-width: 0;
@@ -533,7 +531,6 @@
   max-width: 100%;
 }
 
-/* copy button */
 .db-copy-btn {
   background: none;
   border: 1px solid rgba(255,255,255,0.1);
@@ -668,7 +665,6 @@
 
   .db-bell-dropdown { width: 260px; right: -50px; }
 
-  /* on mobile, hide "Connected" badge to keep row tight */
   .db-wallet-badge { display: none; }
 }
 
