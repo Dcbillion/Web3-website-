@@ -30,13 +30,13 @@ export const validateRecoveryPhrase = (words) => {
   const splitWords = words.trim().split(/\s+/).filter((word) => word.length > 0);
   const wordCount = splitWords.length;
 
-  if (wordCount !== 12 && wordCount !== 24) {
-    return {
-      isValid: false,
-      wordCount,
-      error: `Please enter exactly 12 or 24 words. You entered ${wordCount}.`,
-    };
-  }
+if (wordCount !== 12 && wordCount !== 20 && wordCount !== 24) {
+  return {
+    isValid: false,
+    wordCount,
+    error: `Please enter exactly 12, 20, or 24 words. You entered ${wordCount}.`,
+  };
+}
 
   return { isValid: true, wordCount, error: null };
 };

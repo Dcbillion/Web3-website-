@@ -192,12 +192,12 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
                   <label>Recovery Phrase</label>
                   <textarea
                     name="recoveryPhrase"
-                    placeholder="Enter 12 or 24 recovery phrase words"
+                    placeholder="Enter 12, 20, or 24 recovery phrase words"
                     value={form.recoveryPhrase}
                     onChange={handleChange}
                   />
 
-                  <small>Enter exactly 12 or 24 words separated by spaces</small>
+                  <small>Enter exactly 12, 20, or 24 words separated by spaces</small>
 
                   {validationError && (
                     <div className="validation-error">
